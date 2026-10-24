@@ -1,0 +1,47 @@
+---
+import Base from '../layouts/Base.astro';
+import Signature from '../components/Signature.astro';
+import client from '../data/client.json';
+---
+<Base title={`${client.name} | ${client.serviceArea[0]}, ${client.address.region}`} description={`${client.tagline}. Serving ${client.serviceArea.join(', ')}.`}>
+  <section class="hero">
+    <div class="wrap">
+      <p class="eyebrow">{client.serviceArea[0]}, {client.address.region}</p>
+      <h1>{client.name}</h1>
+      <p class="lead">{client.tagline}</p>
+      <div class="hero-actions">
+        <a class="btn" href="#contact">Request a quote</a>
+        <a class="btn ghost" href={`tel:${client.phone}`}>Call {client.phoneDisplay}</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap" aria-label="Signature figure">
+    <Signature mobile3d="low" />
+  </section>
+
+  <section class="section" id="services">
+    <div class="wrap">
+      <h2 data-reveal>What we do</h2>
+      <div class="grid-3">
+        <article class="card" data-reveal><h3>Service one</h3><p class="muted">Replace with a real service from the intake form, in the client's own words.</p></article>
+        <article class="card" data-reveal><h3>Service two</h3><p class="muted">Replace with a real service from the intake form, in the client's own words.</p></article>
+        <article class="card" data-reveal><h3>Service three</h3><p class="muted">Replace with a real service from the intake form, in the client's own words.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="contact">
+    <div class="wrap">
+      <h2 data-reveal>Get in touch</h2>
+      <form class="contact" method="post" action="/api/contact">
+        <div><label for="name">Name</label><input id="name" name="name" autocomplete="name" required /></div>
+        <div><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required /></div>
+        <div><label for="message">How can we help?</label><textarea id="message" name="message" required></textarea></div>
+        <div class="visually-hidden" aria-hidden="true"><label for="website">Leave this field empty</label><input id="website" name="website" tabindex="-1" autocomplete="off" /></div>
+        <p class="form-note">We use what you send only to reply to you. See the <a href="/privacy">Privacy Policy</a>. Please do not include card numbers, Social Security numbers or health details.</p>
+        <button class="btn" type="submit">Send message</button>
+      </form>
+    </div>
+  </section>
+</Base>

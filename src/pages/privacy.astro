@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+import client from '../data/client.json';
+---
+<Base title={`Privacy Policy | ${client.name}`} description={`How ${client.name} handles the information you send through this website.`} path="/privacy">
+  <div class="wrap section">
+    <h1>Privacy Policy</h1>
+    <p class="muted">Template text. Replace with the filled-in Privacy Policy from the BrightSite Legal Documents Pack and have an attorney review it before launch.</p>
+    <h2>What we collect</h2>
+    <p>The name, email and message you send through the contact form, and basic server logs.</p>
+    <h2>How we use it</h2>
+    <p>To reply to you. We do not sell it.</p>
+    <h2>Contact</h2>
+    <p><a href={`mailto:${client.email}`}>{client.email}</a></p>
+  </div>
+</Base>

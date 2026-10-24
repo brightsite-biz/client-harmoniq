@@ -1,0 +1,67 @@
+---
+import '../styles/tokens.css';
+import '../styles/global.css';
+import client from '../data/client.json';
+
+interface Props { title: string; description: string; path?: string; noindex?: boolean }
+const { title, description, path = '/', noindex = false } = Astro.props;
+const canonical = new URL(path, client.url).href;
+const isPreview = import.meta.env.PUBLIC_PREVIEW === '1';
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  name: client.name,
+  url: client.url,
+  telephone: client.phone,
+  email: client.email,
+  openingHours: client.hours,
+  areaServed: client.serviceArea,
+  address: { '@type': 'PostalAddress', addressLocality: client.address.city, addressRegion: client.address.region, addressCountry: client.address.country },
+};
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {(noindex || isPreview) && <meta name="robots" content="noindex, nofollow" />}
+    {client.template && <meta name="x-template" content="true" />}
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="/">{client.name}</a>
+        <nav class="site-nav" aria-label="Main">
+          <ul>
+            <li><a href="/#services">Services</a></li>
+            <li><a href="/#contact">Contact</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <main id="main"><slot /></main>
+    <footer class="site-footer">
+      <div class="wrap">
+        <p>{client.name} · <a href={`tel:${client.phone}`}>{client.phoneDisplay}</a> · {client.serviceArea.join(', ')}</p>
+        {client.license && <p>{client.license}</p>}
+        <ul aria-label="Legal">
+          <li><a href="/privacy">Privacy Policy</a></li>
+          <li><a href="/accessibility">Accessibility Statement</a></li>
+        </ul>
+        <p>© {new Date().getFullYear()} {client.name}</p>
+      </div>
+    </footer>
+    <script>import '../scripts/motion.js';</script>
+  </body>
+</html>

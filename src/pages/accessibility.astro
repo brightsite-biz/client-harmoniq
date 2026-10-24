@@ -1,0 +1,11 @@
+---
+import Base from '../layouts/Base.astro';
+import client from '../data/client.json';
+---
+<Base title={`Accessibility Statement | ${client.name}`} description={`${client.name} builds this website to WCAG 2.1 AA and welcomes feedback.`} path="/accessibility">
+  <div class="wrap section">
+    <h1>Accessibility Statement</h1>
+    <p class="muted">Template text. Replace with the Accessibility Statement from the BrightSite Legal Documents Pack and fill in the last-tested date.</p>
+    <p>This site is built to WCAG 2.1 level AA and tested with automated tools and manual checks. Some content may still have problems. If you have trouble using any part of this site, contact us at <a href={`mailto:${client.email}`}>{client.email}</a> or {client.phoneDisplay}. We aim to reply within [reply time].</p>
+  </div>
+</Base>
