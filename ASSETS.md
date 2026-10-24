@@ -11,7 +11,7 @@ One row per image and font. Nothing is used without a recorded source and licens
 ## Logo
 | File | Source | License | Date | Notes |
 |---|---|---|---|---|
-| `public/brand/harmoniq-logo-full-gold.png` | Logo concept bought by Cameron (clean file, no watermark) | **Purchase receipt and license terms: not yet on file. Cameron to add.** | 2026-10-24 | Cut from the 1206 x 828 JPG; gold PNG with transparency. |
+| `public/brand/harmoniq-logo-full-gold.png` | Logo concept bought by Cameron (clean file, no watermark) | Bought by Cameron (clean file, no watermark). He confirmed 2026-10-24 that the receipt does not need to be kept on file. Vector files (SVG) to follow from Cameron. | 2026-10-24 | Cut from the 1206 x 828 JPG; gold PNG with transparency. |
 | `public/brand/harmoniq-mark-gold.png` | same | same | 2026-10-24 | Mark only, 525 px wide. Header and schema logo. |
 | `public/brand/harmoniq-wordmark-tagline-gold.png` | same | same | 2026-10-24 | Footer lockup. |
 

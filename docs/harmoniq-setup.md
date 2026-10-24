@@ -24,7 +24,7 @@ Until these exist the form answers "not set up yet". Do a real test submission a
 
 ## Before launch
 - Legal name and filing status, then the attorney's review of the Privacy Policy and Accessibility Statement.
-- Homeowner permission for the installed photos; the logo purchase receipt and license in ASSETS.md.
+- Logo vector files (SVG) from Cameron; the homeowner's permission for the installed photos is confirmed by Cameron (2026-10-24).
 - A public contact address (the pages say requests go through the form).
 - Cameron's answers in docs/copy-to-confirm.md.
 - Real-device check of the 3D on a phone and a tablet. The tests ran with software rendering.
