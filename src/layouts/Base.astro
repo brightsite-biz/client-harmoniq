@@ -1,23 +1,23 @@
 ---
+import '@fontsource/marcellus/latin-400.css';
+import '@fontsource/jost/latin-400.css';
+import '@fontsource/jost/latin-500.css';
 import '../styles/tokens.css';
 import '../styles/global.css';
 import client from '../data/client.json';
 
-interface Props { title: string; description: string; path?: string; noindex?: boolean }
-const { title, description, path = '/', noindex = false } = Astro.props;
+interface Props { title: string; description: string; path?: string; noindex?: boolean; image?: string }
+const { title, description, path = '/', noindex = false, image = '/img/room-onyx-2000.webp' } = Astro.props;
 const canonical = new URL(path, client.url).href;
 const isPreview = import.meta.env.PUBLIC_PREVIEW === '1';
 
+// Pre-launch: no address, phone or reviews exist yet, so none are published. Add them here once they are real.
 const schema = {
   '@context': 'https://schema.org',
-  '@type': 'LocalBusiness',
-  name: client.name,
-  url: client.url,
-  telephone: client.phone,
-  email: client.email,
-  openingHours: client.hours,
-  areaServed: client.serviceArea,
-  address: { '@type': 'PostalAddress', addressLocality: client.address.city, addressRegion: client.address.region, addressCountry: client.address.country },
+  '@graph': [
+    { '@type': 'Organization', name: client.name, url: client.url, slogan: client.tagline, logo: new URL('/brand/harmoniq-mark-gold.png', client.url).href },
+    { '@type': 'WebSite', name: client.name, url: client.url },
+  ],
 };
 ---
 <!doctype html>
@@ -27,25 +27,31 @@ const schema = {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="theme-color" content="#171c22" />
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     {(noindex || isPreview) && <meta name="robots" content="noindex, nofollow" />}
-    {client.template && <meta name="x-template" content="true" />}
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(image, client.url).href} />
     <script type="application/ld+json" set:html={JSON.stringify(schema)} />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to main content</a>
     <header class="site-header">
       <div class="wrap">
-        <a class="brand" href="/">{client.name}</a>
+        <a class="brand" href="/" aria-label="Harmoniq, home">
+          <img src="/brand/harmoniq-mark-gold.png" alt="" width="53" height="34" />
+          <span>Harmoniq</span>
+        </a>
         <nav class="site-nav" aria-label="Main">
           <ul>
-            <li><a href="/#services">Services</a></li>
-            <li><a href="/#contact">Contact</a></li>
+            <li class="opt"><a href="/#inside">Inside</a></li>
+            <li><a href="/#build">Build</a></li>
+            <li class="opt"><a href="/#sizes">Sizes</a></li>
+            <li><a class="cta" href="/#installer">Installer</a></li>
           </ul>
         </nav>
       </div>
@@ -53,8 +59,8 @@ const schema = {
     <main id="main"><slot /></main>
     <footer class="site-footer">
       <div class="wrap">
-        <p>{client.name} · <a href={`tel:${client.phone}`}>{client.phoneDisplay}</a> · {client.serviceArea.join(', ')}</p>
-        {client.license && <p>{client.license}</p>}
+        <img src="/brand/harmoniq-wordmark-tagline-gold.png" alt="Harmoniq. Where architecture and harmony meet." width="300" height="56" loading="lazy" />
+        <p>{client.status} Prices shown are starting prices.</p>
         <ul aria-label="Legal">
           <li><a href="/privacy">Privacy Policy</a></li>
           <li><a href="/accessibility">Accessibility Statement</a></li>

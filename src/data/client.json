@@ -1,18 +1,7 @@
 {
-  "template": true,
-  "name": "Example Electric",
-  "tagline": "Example tagline from the intake form",
-  "url": "https://example.com",
-  "phone": "+1-208-555-0100",
-  "phoneDisplay": "(208) 555-0100",
-  "email": "hello@example.com",
-  "address": { "street": "", "city": "Boise", "region": "ID", "postalCode": "", "country": "US" },
-  "serviceArea": ["Boise", "Meridian", "Nampa"],
-  "hours": "Mon-Fri 8:00-17:00",
-  "license": "",
-  "signature": {
-    "title": "Signature moment goes here",
-    "description": "A short text description of what the interactive figure shows. Screen readers get this instead of the canvas.",
-    "poster": "/poster.svg"
-  }
+  "name": "Harmoniq",
+  "tagline": "Where architecture and harmony meet",
+  "description": "Harmoniq is an acoustic frame for frame-style TVs. Eight speakers in the frame replace the soundbar.",
+  "url": "https://client-harmoniq.pages.dev",
+  "status": "Pre-launch. Not yet available to order."
 }

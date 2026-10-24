@@ -1,0 +1,91 @@
+---
+import product from '../data/product.json';
+const { parts } = product;
+---
+<section class="anat" id="inside" aria-labelledby="inside-h">
+  <div class="wrap anat-head">
+    <p class="eyebrow">Inside the frame</p>
+    <h2 id="inside-h" data-reveal>Take it apart</h2>
+    <p class="muted" data-reveal>Scroll to pull the frame into its layers. Select any layer, in the picture or in the list, to see what it does.</p>
+  </div>
+  <div class="wrap anat-grid">
+    <figure class="anat-stage" data-anatomy data-state="static" data-phone3d="low" aria-labelledby="anat-cap">
+      <div class="figure-frame">
+        <div class="stage" data-label="3D view of the frame pulled into layers. Drag to turn it, use the arrow keys to turn it, or select a layer from the list.">
+          <img class="poster" src="/img/anatomy-poster-1000.webp" srcset="/img/anatomy-poster-1000.webp 1000w, /img/anatomy-poster-1600.webp 1600w" sizes="(max-width: 900px) 100vw, 60vw" alt="The Harmoniq frame pulled apart into its layers: linen face, gold trim, frame finish, eight speakers, HDF frame, damping layer, crossover and wiring, and mounting brackets." width="1600" height="1478" loading="lazy" />
+          <canvas aria-hidden="true"></canvas>
+        </div>
+        <div class="slider">
+          <label for="explode">Separate the layers</label>
+          <input id="explode" type="range" min="0" max="100" value="0" aria-describedby="anat-cap" />
+        </div>
+        <figcaption id="anat-cap">From the front: linen face, gold trim, frame finish, eight speakers, HDF frame, damping layer, crossover and wiring, mounting brackets. An illustration of the structure, not a technical drawing.</figcaption>
+      </div>
+    </figure>
+    <div class="anat-side">
+      <h3 id="parts-h" class="visually-hidden">The eight parts</h3>
+      <ol class="parts" aria-labelledby="parts-h">
+        {parts.map((p, i) => (
+          <li>
+            <button type="button" data-part={p.id} aria-pressed="false" aria-controls={`pt-${p.id}`}>
+              <span class="count" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <span>{p.name}</span>
+            </button>
+            <p class="part-text" id={`pt-${p.id}`}>{p.text}</p>
+          </li>
+        ))}
+      </ol>
+      <p class="anat-note" aria-live="polite" id="anat-status"></p>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { mountViewer, prefersReducedMotion } from '../scripts/viewer.js';
+  const root = document.querySelector('[data-anatomy]');
+  if (root) {
+    const grid = root.closest('.anat-grid');
+    const slider = document.getElementById('explode');
+    const buttons = [...document.querySelectorAll('.parts button')];
+    const texts = new Map(buttons.map((b) => [b.dataset.part, document.getElementById(b.getAttribute('aria-controls')) ]));
+    const status = document.getElementById('anat-status');
+    document.documentElement.classList.add('js-anat');
+
+    let selected = null;
+    const show = (id) => {
+      selected = selected === id ? null : id;
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.part === selected)));
+      texts.forEach((el, key) => { if (el) el.hidden = key !== selected; });
+      if (selected && Number(slider.value) < 55) { slider.value = '80'; setExplode(0.8); }
+      view.set({ selected });
+      status.textContent = selected ? '' : 'Select a layer to read about it.';
+    };
+    texts.forEach((el) => { if (el) el.hidden = true; });
+    status.textContent = 'Select a layer to read about it.';
+
+    const view = mountViewer(root, { mode: 'anatomy', onPick: show });
+    const setExplode = (t) => view.set({ explode: t });
+    view.set({ cloth: '#cdbd9f', finish: '#14161a' });
+
+    const calm = prefersReducedMotion();
+    let manualUntil = 0;
+    slider.addEventListener('input', () => { manualUntil = performance.now() + 2500; setExplode(Number(slider.value) / 100); });
+    buttons.forEach((b) => b.addEventListener('click', () => show(b.dataset.part)));
+
+    // Scroll drives the separation (unless reduced motion is on, or the person just used the slider).
+    const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+    function onScroll() {
+      if (calm || performance.now() < manualUntil || !grid) return;
+      const r = grid.getBoundingClientRect();
+      const run = r.height - root.offsetHeight;
+      if (run <= 0) return;
+      const p = Math.min(1, Math.max(0, -(r.top - 70) / run));
+      const t = smooth(0.05, 0.5, p);
+      slider.value = String(Math.round(t * 100));
+      setExplode(t);
+    }
+    if (!calm) { addEventListener('scroll', onScroll, { passive: true }); onScroll(); }
+    else { slider.value = '60'; setExplode(0.6); }
+
+  }
+</script>

@@ -1,0 +1,114 @@
+{
+  "sizes": [
+    {
+      "inches": 65,
+      "price": 4999
+    },
+    {
+      "inches": 75,
+      "price": 5999
+    },
+    {
+      "inches": 85,
+      "price": 6999
+    },
+    {
+      "inches": 98,
+      "price": 8999
+    }
+  ],
+  "cloth": [
+    {
+      "id": "onyx",
+      "name": "Onyx",
+      "hex": "#1a1c1f",
+      "note": "Black"
+    },
+    {
+      "id": "basalt",
+      "name": "Basalt",
+      "hex": "#5a5e64",
+      "note": "Charcoal gray"
+    },
+    {
+      "id": "alabaster",
+      "name": "Alabaster",
+      "hex": "#e9e4d9",
+      "note": "White"
+    },
+    {
+      "id": "sandstone",
+      "name": "Sandstone",
+      "hex": "#cdbd9f",
+      "note": "Natural oatmeal"
+    }
+  ],
+  "finish": [
+    {
+      "id": "onyx",
+      "name": "Onyx",
+      "hex": "#14161a",
+      "note": "Black"
+    },
+    {
+      "id": "basalt",
+      "name": "Basalt",
+      "hex": "#4d5157",
+      "note": "Charcoal gray"
+    },
+    {
+      "id": "alabaster",
+      "name": "Alabaster",
+      "hex": "#e4dfd3",
+      "note": "White"
+    },
+    {
+      "id": "sandstone",
+      "name": "Sandstone",
+      "hex": "#b9a687",
+      "note": "Natural oatmeal"
+    }
+  ],
+  "parts": [
+    {
+      "id": "linen",
+      "name": "Linen face",
+      "text": "The face is 100 percent linen, stretched across the frame. It is the only part of the speaker you see, and the sound plays out through it."
+    },
+    {
+      "id": "trim",
+      "name": "Gold inner trim",
+      "text": "A fine gold line where the frame meets the screen. It is the detail that makes the frame read as part of the room."
+    },
+    {
+      "id": "moulding",
+      "name": "Frame finish",
+      "text": "The visible edge of the frame, in Onyx, Basalt, Alabaster or Sandstone. Any linen can be paired with any finish."
+    },
+    {
+      "id": "drivers",
+      "name": "Eight speakers",
+      "text": "Four speakers sit in each side rail, eight in all. This is the only place on this site you will see them. In your room they stay behind the linen."
+    },
+    {
+      "id": "hdf",
+      "name": "HDF frame",
+      "text": "The structure is high-density fiberboard (HDF), a dense engineered wood. It carries the speakers and gives the frame its shape."
+    },
+    {
+      "id": "damping",
+      "name": "Damping layer",
+      "text": "Soft material behind the speakers, there to absorb sound from the back of the frame."
+    },
+    {
+      "id": "crossover",
+      "name": "Crossover and wiring",
+      "text": "The wiring bay routes the audio signal to the eight speakers and divides it between them."
+    },
+    {
+      "id": "brackets",
+      "name": "Mounting brackets",
+      "text": "Hardware at the back that fixes the frame to the wall around your TV."
+    }
+  ]
+}

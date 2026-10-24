@@ -1,46 +1,101 @@
 ---
 import Base from '../layouts/Base.astro';
-import Signature from '../components/Signature.astro';
+import Anatomy from '../components/Anatomy.astro';
+import Builder from '../components/Builder.astro';
 import client from '../data/client.json';
+import product from '../data/product.json';
+import { usd } from '../data/format.js';
+const { sizes } = product;
 ---
-<Base title={`${client.name} | ${client.serviceArea[0]}, ${client.address.region}`} description={`${client.tagline}. Serving ${client.serviceArea.join(', ')}.`}>
-  <section class="hero">
-    <div class="wrap">
-      <p class="eyebrow">{client.serviceArea[0]}, {client.address.region}</p>
-      <h1>{client.name}</h1>
-      <p class="lead">{client.tagline}</p>
+<Base title="Harmoniq | The acoustic frame for frame TVs" description={`${client.description} Starting at ${usd(sizes[0].price)}.`}>
+  <section class="hero" aria-labelledby="hero-h">
+    <div class="hero-media">
+      <img src="/img/room-onyx-1000.webp" srcset="/img/room-onyx-1000.webp 1000w, /img/room-onyx-2000.webp 2000w" sizes="100vw" width="2000" height="1500" fetchpriority="high"
+        alt="A black Harmoniq frame with a gold inner trim around a TV, on a walnut-paneled wall above a stone fireplace." />
+    </div>
+    <div class="wrap hero-copy">
+      <p class="eyebrow">{client.tagline}</p>
+      <h1 id="hero-h">Sound, built into the frame.</h1>
+      <p class="lead">An acoustic frame for frame-style TVs. It replaces the soundbar and leaves the wall exactly as you designed it.</p>
+      <p class="from">Starting at <strong>{usd(sizes[0].price)}</strong></p>
       <div class="hero-actions">
-        <a class="btn" href="#contact">Request a quote</a>
-        <a class="btn ghost" href={`tel:${client.phone}`}>Call {client.phoneDisplay}</a>
+        <a class="btn" href="#build">Build yours</a>
+        <a class="btn ghost" href="#installer">Request an installer</a>
       </div>
     </div>
   </section>
 
-  <section class="wrap" aria-label="Signature figure">
-    <Signature mobile3d="low" />
-  </section>
-
-  <section class="section" id="services">
+  <section class="statement section" aria-labelledby="idea-h">
     <div class="wrap">
-      <h2 data-reveal>What we do</h2>
-      <div class="grid-3">
-        <article class="card" data-reveal><h3>Service one</h3><p class="muted">Replace with a real service from the intake form, in the client's own words.</p></article>
-        <article class="card" data-reveal><h3>Service two</h3><p class="muted">Replace with a real service from the intake form, in the client's own words.</p></article>
-        <article class="card" data-reveal><h3>Service three</h3><p class="muted">Replace with a real service from the intake form, in the client's own words.</p></article>
+      <p class="eyebrow" id="idea-h">The idea</p>
+      <p class="big" data-reveal>No soundbar on the shelf. No speakers on the wall. <em>Eight speakers</em> in the frame, behind 100&nbsp;percent linen.</p>
+      <div class="duo">
+        <figure data-reveal>
+          <img src="/img/profile-800.webp" srcset="/img/profile-800.webp 800w, /img/profile-1600.webp 1600w" sizes="(max-width: 800px) 100vw, 55vw" width="1600" height="1200" loading="lazy"
+            alt="A black Harmoniq frame seen from the side, mounted flush on a walnut-paneled wall." />
+          <figcaption>A black frame with gold inner trim, seen from the side.</figcaption>
+        </figure>
+        <figure class="small" data-reveal>
+          <img src="/img/detail-800.webp" srcset="/img/detail-800.webp 800w, /img/detail-1106.webp 1106w" sizes="(max-width: 800px) 100vw, 35vw" width="1106" height="830" loading="lazy"
+            alt="Close-up of the corner of a black Harmoniq frame, with a fine gold line along its edge and around the screen opening." />
+          <figcaption>The gold line, up close.</figcaption>
+        </figure>
       </div>
     </div>
   </section>
 
-  <section class="section" id="contact">
-    <div class="wrap">
-      <h2 data-reveal>Get in touch</h2>
+  <Anatomy />
+  <Builder />
+
+  <section class="sizes section" id="sizes" aria-labelledby="sizes-h">
+    <div class="wrap sizes-grid">
+      <div>
+        <p class="eyebrow">Sizes and prices</p>
+        <h2 id="sizes-h" data-reveal>Four sizes, one starting price each.</h2>
+        <p class="muted" data-reveal>Prices are starting prices. Custom finishes may add to the price.</p>
+        <p class="muted" data-reveal>Harmoniq is sold and installed through installers, so there is no checkout on this site. It is in pre-launch and cannot be ordered yet.</p>
+        <a class="btn ghost" href="#installer">Request an installer</a>
+      </div>
+      <table class="prices" data-reveal>
+        <caption>Starting prices by TV size</caption>
+        <thead class="visually-hidden"><tr><th scope="col">TV size</th><th scope="col">Starting price</th></tr></thead>
+        <tbody>
+          {sizes.map((s) => (
+            <tr><th scope="row">{s.inches}-inch</th><td><small>Starting at</small>{usd(s.price)}</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="installer section" id="installer" aria-labelledby="installer-h">
+    <div class="wrap installer-grid">
+      <div>
+        <p class="eyebrow">Find an installer</p>
+        <h2 id="installer-h" data-reveal>Tell us where you are.</h2>
+        <p class="muted" data-reveal>Harmoniq is installed by professionals and is not shipped to your door. We are building our installer network. Leave your ZIP code and we will get back to you by email.</p>
+        <p class="build-line" id="build-line" hidden><strong>Your build:</strong> <span></span></p>
+      </div>
       <form class="contact" method="post" action="/api/contact">
-        <div><label for="name">Name</label><input id="name" name="name" autocomplete="name" required /></div>
-        <div><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required /></div>
-        <div><label for="message">How can we help?</label><textarea id="message" name="message" required></textarea></div>
+        <div class="row">
+          <div><label for="name">Name</label><input id="name" name="name" autocomplete="name" maxlength="120" pattern=".*\S.*" title="Please enter your name." required /></div>
+          <div><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" maxlength="200" pattern="[^@\s]+@[^@\s]+\.[^@\s]+" title="Please enter a full email address." required /></div>
+        </div>
+        <div class="row">
+          <div><label for="zip">ZIP code</label><input id="zip" name="zip" inputmode="numeric" autocomplete="postal-code" pattern="[0-9]{5}" title="Please enter a five-digit ZIP code, like 83702." maxlength="5" required aria-describedby="zip-help" /><p class="form-note" id="zip-help">Five digits, US only for now.</p></div>
+          <div>
+            <label for="tvsize">TV size</label>
+            <select id="tvsize" name="tvsize">
+              <option value="">Not sure yet</option>
+              {sizes.map((s) => <option value={s.inches}>{s.inches}-inch</option>)}
+            </select>
+          </div>
+        </div>
+        <div><label for="message">Anything we should know? (optional)</label><textarea id="message" name="message" maxlength="4000"></textarea></div>
+        <input type="hidden" id="build-input" name="build" value="" />
         <div class="visually-hidden" aria-hidden="true"><label for="website">Leave this field empty</label><input id="website" name="website" tabindex="-1" autocomplete="off" /></div>
-        <p class="form-note">We use what you send only to reply to you. See the <a href="/privacy">Privacy Policy</a>. Please do not include card numbers, Social Security numbers or health details.</p>
-        <button class="btn" type="submit">Send message</button>
+        <p class="form-note">We use what you send only to reply to you about an installer. See the <a href="/privacy">Privacy Policy</a>. Please do not include card numbers, Social Security numbers or health details.</p>
+        <button class="btn" type="submit">Send request</button>
       </form>
     </div>
   </section>

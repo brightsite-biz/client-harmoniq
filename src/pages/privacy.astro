@@ -3,14 +3,18 @@ import Base from '../layouts/Base.astro';
 import client from '../data/client.json';
 ---
 <Base title={`Privacy Policy | ${client.name}`} description={`How ${client.name} handles the information you send through this website.`} path="/privacy">
-  <div class="wrap section">
+  <div class="wrap page">
     <h1>Privacy Policy</h1>
-    <p class="muted">Template text. Replace with the filled-in Privacy Policy from the BrightSite Legal Documents Pack and have an attorney review it before launch.</p>
+    <p class="muted">Draft. This is template text for the pre-launch site. It needs an attorney's review, and the legal name of the business, before launch.</p>
     <h2>What we collect</h2>
-    <p>The name, email and message you send through the contact form, and basic server logs.</p>
+    <p>When you ask for an installer, we collect the name, email address, ZIP code, TV size and message you send, and the frame choices you made on this page. Our host also keeps basic server logs.</p>
     <h2>How we use it</h2>
-    <p>To reply to you. We do not sell it.</p>
+    <p>To reply to your request and to connect you with an installer. We do not sell your information.</p>
+    <h2>Cookies and tracking</h2>
+    <p>This site does not use advertising or analytics cookies.</p>
+    <h2>Your choices</h2>
+    <p>Ask us to delete or correct what you sent, at any time, by replying to our email.</p>
     <h2>Contact</h2>
-    <p><a href={`mailto:${client.email}`}>{client.email}</a></p>
+    <p>Use the <a href="/#installer">request form</a> and we will reply by email. A public contact address will be added when the business has one.</p>
   </div>
 </Base>

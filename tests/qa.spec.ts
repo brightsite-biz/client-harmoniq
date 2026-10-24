@@ -3,7 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 import fs from 'node:fs';
 
 // Page types to test. Add the client's real pages here.
-const PAGES = ['/', '/privacy', '/accessibility', '/404'];
+const PAGES = ['/', '/privacy', '/accessibility', '/thanks', '/404'];
 const allowTemplate = process.env.QA_ALLOW_TEMPLATE === '1';
 
 async function open(page: Page, path: string) {
@@ -99,37 +99,91 @@ test.describe('site-wide', () => {
 
   test('contact form has labels and a privacy line', async ({ page }) => {
     await open(page, '/');
-    for (const id of ['name', 'email', 'message']) await expect(page.locator(`label[for="${id}"]`)).toHaveCount(1);
+    for (const id of ['name', 'email', 'zip', 'tvsize', 'message']) await expect(page.locator(`label[for="${id}"]`)).toHaveCount(1);
     await expect(page.locator('form.contact a[href="/privacy"]')).toHaveCount(1);
   });
 });
 
-test.describe('signature 3D figure', () => {
-  test('home page figure has a text caption, a poster and a still-image fallback with no JS', async ({ browser }) => {
+// ---- Harmoniq-specific checks -------------------------------------------------------------------------------
+const PUBLIC_PRICES = ['$4,999', '$5,999', '$6,999', '$8,999'];
+
+test.describe('content rules', () => {
+  test('only the public starting prices appear, and never a banned claim', async ({ page }) => {
+    await open(page, '/');
+    const text = await page.evaluate(() => document.body.innerText);
+    const found = [...new Set(text.match(/\$[\d,]+/g) || [])];
+    for (const f of found) expect(PUBLIC_PRICES, `unexpected price ${f}`).toContain(f);
+    for (const price of PUBLIC_PRICES) expect(text).toContain(price);
+    for (const bad of [/solid wood/i, /real wood/i, /acoustically hardened/i, /\boak\b/i, /walnut frame/i, /samsung/i, /\bsonos\b/i, /leon speakers/i, /margin/i, /dealer price/i, /cost to build/i, /reviews?\b.*(stars|rated)/i]) {
+      expect(text, `banned wording ${bad}`).not.toMatch(bad);
+    }
+  });
+
+  test('the speakers are described only as hidden, and the only drivers image is in the layer view', async ({ page }) => {
+    await open(page, '/');
+    const imgs = await page.$$eval('img', (els) => els.map((e) => `${e.getAttribute('src')}|${e.getAttribute('alt')}`));
+    const withDrivers = imgs.filter((i) => /speaker|driver/i.test(i));
+    expect(withDrivers.every((i) => i.includes('anatomy-poster')), `images that mention speakers: ${withDrivers.join(', ')}`).toBe(true);
+  });
+});
+
+test.describe('3D views', () => {
+  test('without JavaScript both figures show a still image and a text caption', async ({ browser }) => {
     const ctx = await browser.newContext({ javaScriptEnabled: false });
     const page = await ctx.newPage();
     await page.goto('/');
-    await expect(page.locator('[data-signature] figcaption')).not.toBeEmpty();
-    await expect(page.locator('[data-signature] img.poster')).toBeVisible();
-    await expect(page.locator('[data-signature]')).toHaveAttribute('data-state', 'static');
+    for (const sel of ['[data-builder]', '[data-anatomy]']) {
+      await expect(page.locator(`${sel} figcaption`)).not.toBeEmpty();
+      await expect(page.locator(`${sel} img.poster`)).toBeVisible();
+      await expect(page.locator(sel)).toHaveAttribute('data-state', 'static');
+    }
+    // every layer is explained in text
+    await expect(page.locator('.part-text')).toHaveCount(8);
+    for (const t of await page.locator('.part-text').all()) await expect(t).toBeVisible();
     await ctx.close();
   });
 
-  test('with WebGL available the figure starts and can be paused (not on phones when mobile3d is off)', async ({ page }, info) => {
+  test('builder starts, turns, can be paused, and the price and summary follow the choices', async ({ page }, info) => {
     await open(page, '/');
-    await page.evaluate(() => window.scrollTo(0, 200));
-    const fig = page.locator('[data-signature]');
-    await expect(fig).toHaveAttribute('data-state', /running|static/, { timeout: 15_000 });
-    await expect.poll(async () => fig.getAttribute('data-state'), { timeout: 20_000 }).toBe('running');
-    const tier = await fig.getAttribute('data-tier');
-    test.info().annotations.push({ type: 'tier', description: `${info.project.name}: ${tier}` });
-    await page.locator('.signature .pause').click();
+    await page.evaluate(() => document.getElementById('build')!.scrollIntoView());
+    const fig = page.locator('[data-builder]');
+    await expect.poll(async () => fig.getAttribute('data-state'), { timeout: 25_000 }).toBe('running');
+    test.info().annotations.push({ type: 'tier', description: `${info.project.name}: ${await fig.getAttribute('data-tier')}` });
+    await fig.evaluate((el) => el.scrollIntoView({ block: 'center' })); // keep the controls clear of the sticky header
+    await page.locator('.build-fig .pause').click();
     await expect(fig).toHaveAttribute('data-state', 'paused');
-    await page.locator('.signature .pause').click();
+    await page.locator('.build-fig .pause').click();
     await expect(fig).toHaveAttribute('data-state', 'running');
+
+    await page.locator('label.choice:has(input[name="size"][value="98"])').click();
+    await page.locator('label.choice:has(input[name="cloth"][value="sandstone"])').click();
+    await page.locator('label.choice:has(input[name="finish"][value="alabaster"])').click();
+    await expect(page.locator('#price')).toHaveText('$8,999');
+    await expect(page.locator('#summary')).toHaveText('98-inch frame, Sandstone linen, Alabaster finish.');
+    await expect(page.locator('#build-input')).toHaveValue(/98-inch frame, Sandstone linen, Alabaster finish\. Starting at \$8,999/);
+    await expect(page.locator('#tvsize')).toHaveValue('98');
+
+    // the still picture (shown when 3D is not available) follows the exact pair that was chosen
+    await expect(page.locator('[data-builder] img.poster')).toHaveAttribute('src', '/img/build/sandstone-alabaster.webp');
+    await expect(page.locator('.room-toggle')).toHaveCount(0); // no fireplace overlay on the builder
   });
 
-  test('without WebGL the page still works and shows the poster', async ({ browser }) => {
+  test('layer view: every layer can be selected from the list, and the slider works', async ({ page }) => {
+    await open(page, '/');
+    await page.evaluate(() => document.getElementById('inside')!.scrollIntoView());
+    const fig = page.locator('[data-anatomy]');
+    await expect.poll(async () => fig.getAttribute('data-state'), { timeout: 25_000 }).toBe('running');
+    const buttons = page.locator('.parts button');
+    await expect(buttons).toHaveCount(8);
+    await buttons.nth(3).click();
+    await expect(buttons.nth(3)).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('#pt-drivers')).toBeVisible();
+    await expect(page.locator('#pt-linen')).toBeHidden();
+    await page.locator('#explode').fill('100');
+    await expect(page.locator('#explode')).toHaveValue('100');
+  });
+
+  test('without WebGL the page still works and shows still images', async ({ browser }) => {
     const ctx = await browser.newContext();
     await ctx.addInitScript(() => {
       const orig = HTMLCanvasElement.prototype.getContext;
@@ -143,18 +197,27 @@ test.describe('signature 3D figure', () => {
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));
     await page.goto('/');
+    await page.evaluate(() => document.getElementById('build')!.scrollIntoView());
     await page.waitForTimeout(2500);
-    await expect(page.locator('[data-signature]')).toHaveAttribute('data-state', 'static');
+    await expect(page.locator('[data-builder]')).toHaveAttribute('data-state', 'static');
+    await page.evaluate(() => document.getElementById('inside')!.scrollIntoView());
+    await page.waitForTimeout(2500);
+    await expect(page.locator('[data-anatomy]')).toHaveAttribute('data-state', 'static');
     expect(errors).toEqual([]);
     await ctx.close();
   });
 
-  test('reduced motion keeps the figure static', async ({ browser }) => {
+  test('reduced motion: the 3D stays but nothing moves by itself, and there is no pause button to need', async ({ browser }) => {
     const ctx = await browser.newContext({ reducedMotion: 'reduce' });
     const page = await ctx.newPage();
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(e.message));
     await page.goto('/');
-    await page.waitForTimeout(2500);
-    await expect(page.locator('[data-signature]')).toHaveAttribute('data-state', 'static');
+    await page.evaluate(() => document.getElementById('build')!.scrollIntoView());
+    await expect.poll(async () => page.locator('[data-builder]').getAttribute('data-state'), { timeout: 25_000 }).toBe('running');
+    await expect(page.locator('[data-builder]')).toHaveAttribute('data-calm', 'true');
+    await expect(page.locator('.build-fig .pause')).toBeHidden();
+    expect(errors).toEqual([]);
     await ctx.close();
   });
 });

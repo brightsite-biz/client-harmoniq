@@ -2,10 +2,14 @@
 import Base from '../layouts/Base.astro';
 import client from '../data/client.json';
 ---
-<Base title={`Accessibility Statement | ${client.name}`} description={`${client.name} builds this website to WCAG 2.1 AA and welcomes feedback.`} path="/accessibility">
-  <div class="wrap section">
+<Base title={`Accessibility Statement | ${client.name}`} description={`${client.name} builds this website to WCAG 2.1 AA and welcomes feedback about anything that is hard to use.`} path="/accessibility">
+  <div class="wrap page">
     <h1>Accessibility Statement</h1>
-    <p class="muted">Template text. Replace with the Accessibility Statement from the BrightSite Legal Documents Pack and fill in the last-tested date.</p>
-    <p>This site is built to WCAG 2.1 level AA and tested with automated tools and manual checks. Some content may still have problems. If you have trouble using any part of this site, contact us at <a href={`mailto:${client.email}`}>{client.email}</a> or {client.phoneDisplay}. We aim to reply within [reply time].</p>
+    <p class="muted">Draft. Confirm the reply time, add the last-tested date and a public contact address before launch.</p>
+    <p>This site is built to WCAG 2.1 level AA and checked with automated tools. Hands-on testing with a keyboard and screen readers is still to be done. Some content may still have problems.</p>
+    <h2>The 3D views</h2>
+    <p>The 3D frame and the layer view are extras. Everything they show is also written in text on the page. You can turn the 3D frame with the mouse, with touch, or with the arrow keys. Automatic rotation can be paused, and it is off if your device asks for reduced motion.</p>
+    <h2>Tell us about a problem</h2>
+    <p>If anything on this site is hard to use, send us a note through the <a href="/#installer">request form</a> and say what happened. We aim to reply within three business days.</p>
   </div>
 </Base>

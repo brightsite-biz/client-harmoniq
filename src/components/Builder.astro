@@ -1,0 +1,129 @@
+---
+import product from '../data/product.json';
+import { usd } from '../data/format.js';
+const { sizes, cloth, finish } = product;
+const first = sizes[0];
+---
+<section class="build on-stone section" id="build" aria-labelledby="build-h">
+  <div class="wrap">
+    <p class="eyebrow">Build yours</p>
+    <h2 id="build-h" data-reveal>Choose the size, the linen and the frame.</h2>
+    <p class="muted" data-reveal>Every linen goes with every frame finish. The picture turns as you choose.</p>
+
+    <div class="build-grid">
+      <figure class="build-fig" data-builder data-state="static" data-phone3d="low" aria-labelledby="build-cap" style="margin:0">
+        <div class="figure-frame">
+          <div class="stage" data-label="3D view of your frame. Drag to turn it, or use the arrow keys.">
+            <img class="poster" src="/img/build/onyx-onyx.webp" alt="A black Harmoniq frame with a gold inner trim, rendered on a plain light wall." width="960" height="920" loading="lazy" />
+            <canvas aria-hidden="true"></canvas>
+          </div>
+          <button type="button" class="pause" aria-pressed="false" hidden>Pause rotation</button>
+          <figcaption id="build-cap">
+            <span id="cap-3d">3D view of your build. Drag to turn it, or use the arrow keys.</span>
+            <span id="cap-still" hidden>A still picture of your build. The 3D view is not available on this device.</span>
+          </figcaption>
+        </div>
+      </figure>
+
+      <div class="controls" id="controls">
+        <fieldset>
+          <legend>Size (TV diagonal)</legend>
+          <div class="choices">
+            {sizes.map((s, i) => (
+              <label class="choice">
+                <input type="radio" name="size" value={s.inches} checked={i === 0} />
+                <span class="box"><span>{s.inches}&quot;<small>starting at {usd(s.price)}</small></span></span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Linen</legend>
+          <div class="choices">
+            {cloth.map((c, i) => (
+              <label class="choice">
+                <input type="radio" name="cloth" value={c.id} checked={i === 0} />
+                <span class="box"><span class="dot" style={`background:${c.hex}`}></span><span>{c.name}<small>{c.note}</small></span></span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Frame finish</legend>
+          <div class="choices">
+            {finish.map((c, i) => (
+              <label class="choice">
+                <input type="radio" name="finish" value={c.id} checked={i === 0} />
+                <span class="box"><span class="dot" style={`background:${c.hex}`}></span><span>{c.name}<small>{c.note}</small></span></span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <div class="price-block" aria-live="polite">
+          <p class="price">Starting at <strong id="price">{usd(first.price)}</strong></p>
+          <p class="summary" id="summary">65-inch frame, Onyx linen, Onyx finish.</p>
+          <p class="price-note">A starting price for this size. Custom finishes may add to the price. Harmoniq is in pre-launch and cannot be ordered yet.</p>
+        </div>
+        <a class="btn" href="#installer" id="request">Request an installer for this build</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { mountViewer } from '../scripts/viewer.js';
+  import product from '../data/product.json';
+  import { usd } from '../data/format.js';
+
+  const fig = document.querySelector('[data-builder]');
+  const controls = document.getElementById('controls');
+  if (fig && controls) {
+    const { sizes, cloth, finish } = product;
+    const byId = (list, id) => list.find((x) => x.id === id);
+    const still = fig.querySelector('img.poster');
+    const cap3d = document.getElementById('cap-3d');
+    const capStill = document.getElementById('cap-still');
+    const priceEl = document.getElementById('price');
+    const summaryEl = document.getElementById('summary');
+    const buildInput = document.getElementById('build-input');
+    const buildLine = document.getElementById('build-line');
+    const sizeSelect = document.getElementById('tvsize');
+    const val = (name) => controls.querySelector(`input[name="${name}"]:checked`)?.value;
+
+    const view = mountViewer(fig, { mode: 'builder' });
+
+    function update() {
+      const size = sizes.find((s) => String(s.inches) === val('size')) || sizes[0];
+      const c = byId(cloth, val('cloth')) || cloth[0];
+      const f = byId(finish, val('finish')) || finish[0];
+      priceEl.textContent = usd(size.price);
+      const text = `${size.inches}-inch frame, ${c.name} linen, ${f.name} finish.`;
+      summaryEl.textContent = text;
+      view.set({ cloth: c.hex, finish: f.hex, size: size.inches });
+
+      // The still picture (used when 3D is not available) matches the exact pair that was chosen.
+      still.src = `/img/build/${c.id}-${f.id}.webp`;
+      still.alt = `${c.name} linen with the ${f.name} frame finish and a gold inner trim, shown on a plain light wall.`;
+
+      if (buildInput) buildInput.value = `${text} Starting at ${usd(size.price)}.`;
+      if (buildLine) { buildLine.hidden = false; buildLine.querySelector('span').textContent = `${text} Starting at ${usd(size.price)}.`; }
+    }
+
+    controls.addEventListener('change', (e) => {
+      update();
+      // The installer form's TV size follows the size choice only once the visitor has actually chosen one.
+      if (sizeSelect && e.target.name === 'size') sizeSelect.value = val('size');
+    });
+
+    const syncCaptions = () => {
+      const isStill = fig.dataset.state === 'static';
+      capStill.hidden = !isStill;
+      cap3d.hidden = isStill;
+    };
+    new MutationObserver(syncCaptions).observe(fig, { attributes: true, attributeFilter: ['data-state'] });
+
+    update();
+    syncCaptions();
+  }
+</script>
